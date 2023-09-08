@@ -10,7 +10,7 @@ pub use {error::*, pak::*};
 #[cfg(all(feature = "oodle", not(target_os = "windows")))]
 compile_error!("Oodle compression only supported on Windows (or WINE)");
 
-pub const MAGIC: u32 = 0x5A6F12E1;
+pub const MAGIC: u32 = 0x6b2a56b8;
 
 #[derive(
     Clone,
@@ -90,7 +90,7 @@ impl Version {
             // additional compression name
             size += 32;
         }
-        size
+        size + 1
     }
 
     /// Losslessly convert full version into major version

@@ -81,7 +81,7 @@ impl Entry {
             true => 4, // blocks uncompressed
             false => 0,
         };
-        size
+        size + 1
     }
 
     pub fn read<R: io::Read>(
@@ -90,6 +90,7 @@ impl Entry {
     ) -> Result<Self, super::Error> {
         // since i need the compression flags, i have to store these as variables which is mildly annoying
         let offset = reader.read_u64::<LE>()?;
+        let _extra_byte = reader.read_u8()?;
         let compressed = reader.read_u64::<LE>()?;
         let uncompressed = reader.read_u64::<LE>()?;
         let compression = match if version == Version::V8A {
@@ -139,6 +140,7 @@ impl Entry {
             EntryLocation::Data => 0,
             EntryLocation::Index => self.offset,
         })?;
+        writer.write_u8(0)?; // extra byte
         writer.write_u64::<LE>(self.compressed)?;
         writer.write_u64::<LE>(self.uncompressed)?;
         let compression = self.compression.map_or(0, |n| n + 1);

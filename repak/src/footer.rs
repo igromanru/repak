@@ -31,7 +31,7 @@ impl Footer {
             version,
             version_major: VersionMajor::from_repr(reader.read_u32::<LE>()?)
                 .unwrap_or(version.version_major()),
-            index_offset: reader.read_u64::<LE>()?,
+            index_offset: (reader.read_u8()?, reader.read_u64::<LE>()?).1,
             index_size: reader.read_u64::<LE>()?,
             hash: reader.read_guid()?,
             frozen: version.version_major() == VersionMajor::FrozenIndex && reader.read_bool()?,
@@ -83,6 +83,7 @@ impl Footer {
         }
         writer.write_u32::<LE>(self.magic)?;
         writer.write_u32::<LE>(self.version_major as u32)?;
+        writer.write_u8(0)?;
         writer.write_u64::<LE>(self.index_offset)?;
         writer.write_u64::<LE>(self.index_size)?;
         writer.write_all(&self.hash)?;
