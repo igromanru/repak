@@ -116,14 +116,14 @@ impl Entry {
                 true => Some(reader.read_array(Block::read)?),
                 false => None,
             },
-            flags: match version.version_major() >= VersionMajor::CompressionEncryption {
-                true => reader.read_u8()?,
-                false => 0,
-            },
             compression_block_size: match version.version_major()
                 >= VersionMajor::CompressionEncryption
             {
                 true => reader.read_u32::<LE>()?,
+                false => 0,
+            },
+            flags: match version.version_major() >= VersionMajor::CompressionEncryption {
+                true => reader.read_u8()?,
                 false => 0,
             },
         })
@@ -162,8 +162,8 @@ impl Entry {
                     block.write(writer)?;
                 }
             }
-            writer.write_u8(self.flags)?;
             writer.write_u32::<LE>(self.compression_block_size)?;
+            writer.write_u8(self.flags)?;
         }
 
         Ok(())
